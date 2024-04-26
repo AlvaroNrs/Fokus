@@ -31,9 +31,10 @@ const audioPausa = new Audio('./sons/pause.mp3');
 
 let tempoDecorridoEmSegundos = 1500;
 let intervaloId = null;
+let contextoAtual = 'foco';
 
 
-musicaFocoInput.addEventListener('change', () => {
+musicaFocoInput.addEventListener('click', () => {
     //A música só da play se estiver pausada
     if(musica.paused){
         musica.play();
@@ -89,12 +90,20 @@ function alterarContexto(contexto) {
         break;
 
     }
+    contextoAtual = contexto;
 }
 
 const contagemRegressiva = () => {
     if(tempoDecorridoEmSegundos <= 0){
         audioTempoFinalizado.play();
         alert('Tempo finalizado!');
+        const focoAtivo = html.getAttribute('data-contexto') == 'foco';
+        if(focoAtivo) {
+            //Criação de evento customizado
+            const evento = new CustomEvent('FocoFinalizado');
+            //Disparando o evento
+            document.dispatchEvent(evento);
+        }
         zerar();
         return;
     }
@@ -125,6 +134,18 @@ function zerar() {
     iniciarOuPausarBt.textContent = "Começar";
     iniciarOuPausarBtIcone.setAttribute('src', './imagens/play_arrow.png');
     intervaloId = null;
+    switch (contextoAtual) {
+        case "foco":
+            tempoDecorridoEmSegundos = 1500;
+            break;
+        case "descanso-curto":
+            tempoDecorridoEmSegundos = 600;
+            break;
+        case "descanso-longo":
+            tempoDecorridoEmSegundos = 900;
+            break;
+    }
+    mostrarTempo();
 }
 
 function mostrarTempo() {
